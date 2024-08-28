@@ -16,6 +16,7 @@ import com.pro.user.service.entities.User;
 import com.pro.user.service.services.UserService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.Builder;
 
@@ -36,6 +37,7 @@ public class UserController {
 	@GetMapping("/{userId}")
 	@CircuitBreaker(name="ratingHotelBreaker",fallbackMethod = "ratingHotelFallbackMethod")
 	@Retry(name="ratingHotelBreaker",fallbackMethod = "ratingHotelFallbackMethod")
+	@RateLimiter(name="userRateLimiter",fallbackMethod = "ratingHotelFallbackMethod")
 	public ResponseEntity<User> getSingleUser(@PathVariable String userId){
 		var userData=userService.getUser(userId);
 		return  ResponseEntity.ok(userData);
