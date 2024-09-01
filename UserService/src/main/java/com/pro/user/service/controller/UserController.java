@@ -18,7 +18,6 @@ import com.pro.user.service.services.UserService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.Builder;
 
 @RestController
 @RequestMapping("/users")

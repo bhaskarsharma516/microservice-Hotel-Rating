@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,6 +14,7 @@ import com.pro.user.service.entities.Hotel;
 import com.pro.user.service.entities.Rating;
 import com.pro.user.service.entities.User;
 import com.pro.user.service.exceptions.ResourceNotFoundException;
+import com.pro.user.service.exceptions.UsernameAlreadyExistException;
 import com.pro.user.service.external.services.HotelService;
 import com.pro.user.service.repo.UserRepo;
 import com.pro.user.service.services.UserService;
@@ -35,7 +36,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User saveUser(User user) {
+		var valid=userRepo.findByUsername(user.getUsername());
+		if(valid!=null) {
+			throw new UsernameAlreadyExistException("Username already exist.Try with different username");
+		}
 		String randomUserID=UUID.randomUUID().toString();
+		BCryptPasswordEncoder encoder=new BCryptPasswordEncoder(16);
+		user.setPassword(encoder.encode(user.getPassword()));
 		user.setUserId(randomUserID);
 		return userRepo.save(user);
 	}

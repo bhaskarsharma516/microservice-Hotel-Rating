@@ -6,4 +6,5 @@ import com.pro.user.service.entities.User;
 
 public interface UserRepo extends JpaRepository<User, String> {
 
+	User findByUsername(String username);
 }

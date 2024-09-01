@@ -26,12 +26,14 @@ public class User {
 	@Id
 	@Column(name="ID")
 	private String userId;
+	private String username;
 	@Column(name="NAME")
 	private String name;
 	@Column(name="EMAIL")
 	private String email;
 	@Column(name="ABOUT")
 	private String about;
+	private String password;
 	@Transient
 	private List<Rating> ratings=new ArrayList<>();
 

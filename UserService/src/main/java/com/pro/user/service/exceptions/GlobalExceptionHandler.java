@@ -13,8 +13,14 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ApiResponse> handleResourceNotFoundException(ResourceNotFoundException ex){
 		String message =ex.getMessage();
-		var response=ApiResponse.builder().message(message).success(true).build();
+		var response=ApiResponse.builder().message(message).success(true).status(HttpStatus.NOT_FOUND).build();
 		return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
 	}
 
+	@ExceptionHandler(UsernameAlreadyExistException.class)
+	public ResponseEntity<ApiResponse> handleUsernameAlreadyExistException(UsernameAlreadyExistException ex){
+		String message =ex.getMessage();
+		var response=ApiResponse.builder().message(message).success(true).status(HttpStatus.FOUND).build();
+		return new ResponseEntity<>(response,HttpStatus.FOUND);
+	}
 }
