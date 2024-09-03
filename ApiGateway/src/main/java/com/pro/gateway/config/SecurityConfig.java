@@ -11,6 +11,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import com.pro.gateway.services.MyUserDetailsService;
@@ -20,12 +22,12 @@ import com.pro.gateway.services.MyUserDetailsService;
 public class SecurityConfig {
 	
 		@Bean
-		SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
+		 SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
 			http.csrf(csrf->csrf.disable());
 			http.cors(cors->cors.disable());
 		   http
 				.authorizeExchange(exchanges -> exchanges
-		                .pathMatchers("/login/**").permitAll()
+		                .pathMatchers("/login/**","/users/add").permitAll()
 		                .anyExchange().authenticated());
 		   
 		 return http.build();
@@ -33,18 +35,15 @@ public class SecurityConfig {
 	   }
 
 	    @Bean
-	    ReactiveUserDetailsService userDetailsService() {
+	     ReactiveUserDetailsService userDetailsService() {
 	     
 	    	return new MyUserDetailsService();
 	    }
 
-	    @Bean
-	    BCryptPasswordEncoder passwordEncoder() {
-	        return new BCryptPasswordEncoder();
-	    }
+
 
 	    @Bean
-	     ReactiveAuthenticationManager authenticationManager() throws Exception {
+	    ReactiveAuthenticationManager authenticationManager() throws Exception {
 	        return new UserDetailsRepositoryReactiveAuthenticationManager(this.userDetailsService());
 	    }
 	    
