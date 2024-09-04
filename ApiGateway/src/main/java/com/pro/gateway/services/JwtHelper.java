@@ -1,26 +1,22 @@
 package com.pro.gateway.services;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.pro.gateway.config.UserPrinciple;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import reactor.core.publisher.Mono;
 
 @Component
 public class JwtHelper {
@@ -63,12 +59,6 @@ public class JwtHelper {
     			
     }
 
-    //check if the token has expired
-    private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
-    }
-
     //generate token for user
 	public String generateToken(Authentication authentication ) {
         Map<String, Object> claims = new HashMap<>();
@@ -76,30 +66,13 @@ public class JwtHelper {
     }
 
     private String doGenerateToken(Map<String, Object> claims, Authentication authentication) {
-    	String role=authentication.getAuthorities().stream()
-    			.map(r->r.getAuthority()).collect(Collectors.toSet()).iterator().next();
-
-        return Jwts.builder().claim("role",role).setSubject(authentication.getName()).setIssuedAt(new Date(System.currentTimeMillis()))
+ 
+        return Jwts.builder().setSubject(authentication.getName() ).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(key, SignatureAlgorithm.HS512).compact();
     }
 
-    //validate token
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-    }
-
-    public UsernamePasswordAuthenticationToken getAuthenticationToken(final String token, final Authentication existingAuth, final UserDetails userDetails) {
-
-        Claims claims = getAllClaimsFromToken(token);
-
-       final Collection<? extends GrantedAuthority> authorities =
-               Arrays.stream(claims.get("role").toString().split(","))
-                       .map(SimpleGrantedAuthority::new)
-                       .collect(Collectors.toList());
-
-       return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
-   }
+  
+   
 
 }
