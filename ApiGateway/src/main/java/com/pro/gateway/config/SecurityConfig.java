@@ -1,19 +1,26 @@
 package com.pro.gateway.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
-import com.pro.gateway.services.MyUserDetailsService;
-
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
+	
+	   @Autowired
+	   private JwtAuthenticationFilter filter;
+	   
+	   @Autowired
+	   private ReactiveUserDetailsService userDetailsService;
+	    
 	
 		@Bean
 		 SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
@@ -21,25 +28,18 @@ public class SecurityConfig {
 			http.cors(cors->cors.disable());
 		   http
 				.authorizeExchange(exchanges -> exchanges
-		                .pathMatchers("/login/**","/users/**","/config/**").permitAll()
+		                .pathMatchers("/login/**","/config/**").permitAll()
 		                .anyExchange().authenticated());
-		   
-		   
-		 return http.build();
+		    http.addFilterBefore(filter, SecurityWebFiltersOrder.AUTHENTICATION);
+		   return http.build();
 
 	   }
 
-	    @Bean
-	     ReactiveUserDetailsService userDetailsService() {
-	     
-	    	return new MyUserDetailsService();
-	    }
-
-
+	  
 
 	    @Bean
 	    ReactiveAuthenticationManager authenticationManager() throws Exception {
-	        return new UserDetailsRepositoryReactiveAuthenticationManager(this.userDetailsService());
+	        return new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
 	    }
 	    
 

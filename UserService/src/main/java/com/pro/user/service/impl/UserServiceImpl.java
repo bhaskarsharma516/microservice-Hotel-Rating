@@ -6,9 +6,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService , UserDetailsService{
+public class UserServiceImpl implements UserService{
 
 	@Autowired
 	private UserRepo userRepo;
@@ -86,13 +83,5 @@ public class UserServiceImpl implements UserService , UserDetailsService{
 		
 	}
 
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		 var user = userRepo.findByUsername(username);
-	        if (user == null) {
-	            throw new UsernameNotFoundException("User not found");
-	        }
-	        return user;
-	}
 
 }
