@@ -3,10 +3,13 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -21,6 +24,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import reactor.core.publisher.Mono;
 
 @Component
+@Order(-1)
 public class JwtAuthenticationFilter implements WebFilter  {
 
   
@@ -87,10 +91,11 @@ public class JwtAuthenticationFilter implements WebFilter  {
 			}
 	            Boolean validateToken = this.jwtHelper.validateToken(authToken, userDetails);
 	            if (validateToken) {
+	            	System.out.println("validated");
 
-//	                //set the authentication
-	            	 UsernamePasswordAuthenticationToken authentication = jwtHelper.getAuthenticationToken(authToken, SecurityContextHolder.getContext().getAuthentication(), userDetails);
-	            	ReactiveSecurityContextHolder.withAuthentication(authentication);
+	            	SecurityContext context = new SecurityContextImpl(new UsernamePasswordAuthenticationToken(userDetails, authToken, userDetails.getAuthorities()));
+	            	return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(context)));
+	            	
 
 	            } else {
 	            	return Mono.error(new RuntimeException("Validation Failed"));

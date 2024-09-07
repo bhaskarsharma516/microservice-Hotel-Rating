@@ -26,11 +26,12 @@ public class SecurityConfig {
 		 SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
 			http.csrf(csrf->csrf.disable());
 			http.cors(cors->cors.disable());
+			http.addFilterBefore(filter, SecurityWebFiltersOrder.AUTHENTICATION);
 		   http
 				.authorizeExchange(exchanges -> exchanges
-		                .pathMatchers("/login/**","/config/**").permitAll()
+		                .pathMatchers("/login").permitAll()
 		                .anyExchange().authenticated());
-		    http.addFilterBefore(filter, SecurityWebFiltersOrder.AUTHENTICATION);
+		    
 		   return http.build();
 
 	   }
