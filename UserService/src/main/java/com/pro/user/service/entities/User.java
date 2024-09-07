@@ -1,7 +1,11 @@
 package com.pro.user.service.entities;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class User implements UserDetails{
 
 	@Id
 	@Column(name="ID")
@@ -36,6 +40,11 @@ public class User {
 	private String password;
 	@Transient
 	private List<Rating> ratings=new ArrayList<>();
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 }
